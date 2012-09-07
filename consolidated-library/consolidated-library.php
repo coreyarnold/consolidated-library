@@ -73,7 +73,7 @@ function consol_lib_printvideogames($atts) {
 	{
 		if ($filters != "")
 			$filters .= " AND ";
-		$filters .= $wpdb->prepare("rating = %d",$rating);
+		$filters .= $wpdb->prepare("rating >= %d",$rating);
 	}
 	if ($coop != "all")
 	{
