@@ -1,0 +1,77 @@
++ shortcode for xbox game list
++ shortcode for steam game list
++ shortcode for pc game list
++ shortcode for ps3 game list
+- store steam community username
++ shortcode for grid of games by platform
+   (graphic, title, platform, genre, #players, coop, date acquired, status, state, rating, notes)
+- make grid output look good and show all relevant data
++ build filter for stats
++ build filter for rating
++ build filter for coop
+
+---Release v1---
+- pull game list in via steam api
+- parse xml
+
+
+
+
+--- Major Backlog ---
+High level requirements:
+Lists of Stuff
+
+--books
+currently reading
+part of a book group?
+trim white space from search strings
+ratings
+--movies
+ratings?
+integration with Netflix?
+integration with IMDB
+--board games
+favorites
+integration with BGG?
+ratings
+--videogames
+currently playing
+ratings
+things out on loan
+when on loan, have an indicator (grayed out, name of loanee drawn on cover, etc.)
+steam games
+ o API integration
+friends that have the same game(s)
+--Recipes
+General thoughts.
+Construct the lists as a generic list of items. Making items and extending them into books, video games, movies, etc. will allow us to reuse a lot of the similar characteristics (title, purchase price, rating, etc.) while still allowing us to add specific properties such as platform, format (dvd, blu-ray), etc.
+ 
+It might be good to kind of bootstrap the collection by importing a CSV or XML file from some other application/system. Long term we need to think about entry. It would be awesome to be able to use a webcam to scan barcodes!
+
+
+make the content visible only when logged in
+make the entry as easy/complicated as somebody wants. just UPC, maybe a manual mode with just the essentials, etc.
+Users/Groups/Authentication
+
+Facebook integration
+google integration?
+openid?
+Book groups
+
+support multiple user discussion
+access books in a user’s booklist
+calendar for when to meet, when to post
+reminder system if haven’t posted “on time”
+support multiple book groups going, all with different users
+ 
+
+Action items:
+
+Home Page
+Remove/Replace graphic ‘BlakMagic’.
+Remove RSS feed link. (done)
+Review http://www.collectorz.com/ and see if we can use it for db collection or build our own.
+Book Discussion
+Add Now Reading Reloaded to right hand side (done)
+Fix search and login buttons (done)
+ 
