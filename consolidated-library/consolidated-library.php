@@ -23,7 +23,7 @@ Author URI: http://www.coreyarnold.com/
         `multiplayerMaxPlayers` decimal(1,0) DEFAULT NULL,
         `coop` tinyint(1) DEFAULT NULL,
         `coopMaxPlayers` decimal(1,0) DEFAULT NULL,
-        `rating` decimal(2,0) DEFAULT NULL,
+        `rating` decimal(2,1) DEFAULT NULL,
         `purchase_price` decimal(5,2) DEFAULT NULL,
         `purchase_date` date DEFAULT NULL,
         `amazon_link` varchar(255) DEFAULT NULL,
@@ -103,13 +103,27 @@ function videogames_print_list($listresultset) {
 }
 
 function videogames_print_grid($resultset) {
-       echo "<p><b>Game Grid</b><br />";
-       foreach($resultset as $game){
-           $title = $game['title'];
-           echo "Title: $title<br />";
-       }
-       
-       echo "</p>";
+       	echo "<p><b>Game Grid</b><br />";
+		echo "<table><thead><th>Title</th><th>Platform</th><th>Genre(s)</th><th>Coop</th><th>Rating</th></thead>";
+       	foreach($resultset as $game){
+			echo "<tr>";
+			if ($game['amazon_link'] != "")
+				$link = "<a href=\"http://www.amazon.com/gp/product/" . $game['amazon_link'] . "/ref=as_li_ss_tl?ie=UTF8&camp=1789&creative=390957&creativeASIN=" . $game['amazon_link'] . "&linkCode=as2&tag=arnfamtim-20\">" . $game['title'] . "</a>";
+			else
+				$link = $game['title'];
+			echo "<td>" . $link . "</td>";
+			echo "<td>" . $game['platform'] . "</td>";
+			echo "<td>" . $game['genre'] . "</td>";
+			if ($game['coop'] == 1)
+				$coop = 'Y';
+			else
+				$coop = 'N';
+			echo "<td>" . $coop . "</td>";
+			echo "<td>" . $game['rating'] . "</td>";
+			echo "</tr>";
+       	}
+       	echo "</table>";
+       	echo "</p>";
 }
 
    /* Creates new database field */

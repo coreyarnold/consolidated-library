@@ -2,7 +2,6 @@
 + shortcode for steam game list
 + shortcode for pc game list
 + shortcode for ps3 game list
-- store steam community username
 + shortcode for grid of games by platform
    (graphic, title, platform, genre, #players, coop, date acquired, status, state, rating, notes)
 - make grid output look good and show all relevant data
@@ -11,6 +10,9 @@
 + build filter for coop
 
 ---Release v1---
+
+- add collection of steam user
+- add collection of steam api key
 - pull game list in via steam api
 - parse xml
 
