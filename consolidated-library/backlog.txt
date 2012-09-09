@@ -4,15 +4,16 @@
 + shortcode for ps3 game list
 + shortcode for grid of games by platform
    (title, platform, genre, coop, date acquired, status, state, rating, notes)
-- make grid output look good and show all relevant data
++ make grid output look good and show all relevant data
 + build filter for stats
 + build filter for rating
 + build filter for coop
-- show images for steam games
-- show images for non steam games (if we have them)
++ show images for steam games
 
 ---Release v1---
 
+- store images/paths? for non-steam games
+- show images for non steam games (if we have them)
 - add collection of steam user
 - add collection of steam api key
 - pull game list in via steam api
