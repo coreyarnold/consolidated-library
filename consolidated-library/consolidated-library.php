@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: Consolidated Library
-Version: 0.1
+Version: 0.2
 Plugin URI: http://www.coreyarnold.com/ConsolidatedLibrary/
 Description: Provides a consolidated place to store libraries of things. DVDs, Books, Video Games, Board and Card Games, CDs, etc.
 Author: Corey Arnold
@@ -21,7 +21,7 @@ Author URI: http://www.coreyarnold.com/
         `singleplayer` tinyint(1) DEFAULT NULL,
         `multiplayer` tinyint(1) DEFAULT NULL,
         `multiplayerMaxPlayers` decimal(1,0) DEFAULT NULL,
-        `coop` tinyint(1) DEFAULT NULL,
+        `coop` tinyint(1) DEFAULT 0,
         `coopMaxPlayers` decimal(1,0) DEFAULT NULL,
         `rating` decimal(2,1) DEFAULT NULL,
         `purchase_price` decimal(5,2) DEFAULT NULL,
@@ -83,7 +83,7 @@ function consol_lib_printvideogames($atts) {
 	}
 	if ($filters != "")
 		$filters = "WHERE $filters";
-       $sql = "select id, title, platform, genre, coop, coopMaxPlayers, rating, amazon_link from $tablename $filters order by title;";
+       $sql = "select id, title, platform, genre, coop, coopMaxPlayers, rating, amazon_link, graphic_url from $tablename $filters order by title;";
 
        $results = $wpdb->get_results($sql, ARRAY_A);
 	if ($outputstyle == "list")
@@ -104,9 +104,13 @@ function videogames_print_list($listresultset) {
 
 function videogames_print_grid($resultset) {
        	echo "<p><b>Game Grid</b><br />";
-		echo "<table><thead><th>Title</th><th>Platform</th><th>Genre(s)</th><th>Coop</th><th>Rating</th></thead>";
+		echo "<table><thead><th></th><th>Title</th><th>Platform</th><th>Genre(s)</th><th>Coop</th><th>Rating</th></thead>";
        	foreach($resultset as $game){
 			echo "<tr>";
+			echo "<td>";
+			if ($game['graphic_url'] != "")
+				echo "<img src=\"" . $game['graphic_url'] . "\">";
+			echo "</td>";
 			if ($game['amazon_link'] != "")
 				$link = "<a href=\"http://www.amazon.com/gp/product/" . $game['amazon_link'] . "/ref=as_li_ss_tl?ie=UTF8&camp=1789&creative=390957&creativeASIN=" . $game['amazon_link'] . "&linkCode=as2&tag=arnfamtim-20\">" . $game['title'] . "</a>";
 			else
@@ -152,8 +156,7 @@ if ( is_admin() ){
  <tr valign="top">
  <th width="92" scope="row">Enter Text:</th>
  <td width="406">
- <input name="my_first_data" type="text" id="my_first_data"
- value="<?php echo get_option('my_first_data'); ?>" />
+ <input name="my_first_data" type="text" id="my_first_data" value="<?php echo get_option('my_first_data'); ?>" />
  </td>
  </tr>
  </table>
