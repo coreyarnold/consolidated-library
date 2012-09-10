@@ -1,22 +1,9 @@
-+ shortcode for xbox game list
-+ shortcode for steam game list
-+ shortcode for pc game list
-+ shortcode for ps3 game list
-+ shortcode for grid of games by platform
-   (title, platform, genre, coop, date acquired, status, state, rating, notes)
-+ make grid output look good and show all relevant data
-+ build filter for stats
-+ build filter for rating
-+ build filter for coop
-+ show images for steam games
-
----Release v1---
-
 - store images/paths? for non-steam games
 - show images for non steam games (if we have them)
 - add collection of steam user
 - add collection of steam api key
 - pull game list in via steam api
+  o http://steamcommunity.com/id/[username]/games?tab=all&xml=1
 - parse xml
 - pull in cover images from amazon if we're not already storing them
 

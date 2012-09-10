@@ -1,0 +1,12 @@
+=== Release v0.1 ===
++ shortcode for xbox game list
++ shortcode for steam game list
++ shortcode for pc game list
++ shortcode for ps3 game list
++ shortcode for grid of games by platform
+   (title, platform, genre, coop, date acquired, status, state, rating, notes)
++ make grid output look good and show all relevant data
++ build filter for stats
++ build filter for rating
++ build filter for coop
++ show images for steam games
