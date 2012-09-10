@@ -132,11 +132,32 @@ function videogames_print_grid($resultset) {
 
    add_shortcode( 'steamgames', 'videogames_liststeamgames');
 function videogames_liststeamgames(){
-	$ProfileURL = "http://steamcommunity.com/id/" . get_option('steam_profile') . "/";
-	$xml = simplexml_load_file($ProfileURL . '?xml=1');
-	$steamID64 = $xml->steamID64;
-	echo $steamID64;
+	///games?tab=all&xml=1
+	$BaseSteamURL = "http://steamcommunity.com/id/" . get_option('steam_profile') . "/";
+	$ProfileURL = $BaseSteamURL . "?xml=1";
+	PrintSteamProfileInfo($ProfileURL);
+	$GamesURL = $BaseSteamURL . 'games?tab=all&xml=1';
+	echo "<a href=\"$GamesURL\">" . $GamesURL . "</a><br />";
+	$xml = simplexml_load_file($ProfileURL);
+	$steamID64 =  $xml->steamID64;
+	parseSteamXML($xml);
+//	$iter = new SimpleXMLIterator($xml,null);
 }
+/* start test code */
+
+  function parseSteamXML($str) {
+	var_dump($str);
+  }
+
+	function PrintSteamProfileInfo($pURL) {
+		$profileXML = simplexml_load_file($pURL);
+		echo "<div>";
+		echo "SteamID: " . $profileXML->steamID . "<br />";
+		echo $profileXML->stateMessage . "<br />";
+		echo "</div>";
+	}
+
+/* end test code */
    /* Creates new database field */
    add_option("steam_profile", 'coreyarnold', '', 'yes');
    add_option("steam_api_key", '', '', 'yes');
