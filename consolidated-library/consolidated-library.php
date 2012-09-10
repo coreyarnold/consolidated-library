@@ -130,9 +130,16 @@ function videogames_print_grid($resultset) {
        	echo "</p>";
 }
 
+   add_shortcode( 'steamgames', 'videogames_liststeamgames');
+function videogames_liststeamgames(){
+	$ProfileURL = "http://steamcommunity.com/id/" . get_option('steam_profile') . "/";
+	$xml = simplexml_load_file($ProfileURL . '?xml=1');
+	$steamID64 = $xml->steamID64;
+	echo $steamID64;
+}
    /* Creates new database field */
-//   add_option("my_first_data", 'Testing !! My Plugin is Working Fine.', 'This is my first plugin panel data.', 'yes');
-
+   add_option("steam_profile", 'coreyarnold', '', 'yes');
+   add_option("steam_api_key", '', '', 'yes');
 
 /* Admin Panel */
 if ( is_admin() ){
@@ -154,9 +161,9 @@ if ( is_admin() ){
 
  <table width="510">
  <tr valign="top">
- <th width="92" scope="row">Enter Text:</th>
+ <th width="92" scope="row">Steam Profile:</th>
  <td width="406">
- <input name="my_first_data" type="text" id="my_first_data" value="<?php echo get_option('my_first_data'); ?>" />
+ <input name="steam_profile" type="text" id="steam_profile" value="<?php echo get_option('steam_profile'); ?>" />
  </td>
  </tr>
  </table>
