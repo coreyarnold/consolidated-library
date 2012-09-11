@@ -132,74 +132,23 @@ function videogames_print_grid($resultset) {
 
    add_shortcode( 'steamgames', 'videogames_liststeamgames');
 function videogames_liststeamgames(){
-	///games?tab=all&xml=1
-	$BaseSteamURL = "http://steamcommunity.com/id/" . get_option('steam_profile') . "/";
-	$ProfileURL = $BaseSteamURL . "?xml=1";
-	PrintSteamProfileInfo($ProfileURL);
-	$GamesURL = $BaseSteamURL . 'games?tab=all&xml=1';
-	echo "<a href=\"$GamesURL\">" . $GamesURL . "</a><br />";
-	$xml = simplexml_load_file($ProfileURL);
-	$steamID64 =  $xml->steamID64;
-	parseSteamXML($xml);
-//	$iter = new SimpleXMLIterator($xml,null);
 }
-/* start test code */
 
-  function parseSteamXML($str) {
-	var_dump($str);
-  }
-
-	function PrintSteamProfileInfo($pURL) {
-		$profileXML = simplexml_load_file($pURL);
-		echo "<div>";
-		echo "SteamID: " . $profileXML->steamID . "<br />";
-		echo $profileXML->stateMessage . "<br />";
-		echo "</div>";
-	}
-
-/* end test code */
    /* Creates new database field */
-   add_option("steam_profile", 'coreyarnold', '', 'yes');
-   add_option("steam_api_key", '', '', 'yes');
+//   add_option("steam_profile", 'coreyarnold', '', 'yes');
+//   add_option("steam_api_key", 'D5B5B67015EDEA4B8C6D356445F30BEE', '', 'yes');
 
-/* Admin Panel */
-if ( is_admin() ){
-   add_action('admin_menu', 'my_first_admin_menu');
-
-   function my_first_admin_menu() {
-      add_options_page('My First', 'Consolidated Library', 'administrator', 'consol-library', 'consol_library_plugin_page');
-   }
+//*************** Admin function ***************
+function consol_lib_admin() {
+	include('consol_lib_admin.php');
 }
 
-/* Call the Plugin Interface Page Code */
- function consol_library_plugin_page() {
- ?>
- <div>
- <h2>Consolidated Library Plugin Options Page</h2>
-
- <form method="post" action="options.php">
- <?php wp_nonce_field('update-options'); ?>
-
- <table width="510">
- <tr valign="top">
- <th width="92" scope="row">Steam Profile:</th>
- <td width="406">
- <input name="steam_profile" type="text" id="steam_profile" value="<?php echo get_option('steam_profile'); ?>" />
- </td>
- </tr>
- </table>
-
- <input type="hidden" name="action" value="update" />
- <input type="hidden" name="page_options" value="my_first_data" />
-
- <p>
- <input type="submit" value="<?php _e('Save Changes') ?>" />
- </p>
-
- </form>
- </div>
- <?php
+function consol_lib_admin_actions() {
+//    add_options_page("Consolidated Library Display", "Consolidated Library Display", 'administrator', "Consolidated Library Display", "consol_lib_admin");
+	add_options_page('My First', 'Consolidated Library', 'administrator', 'consol-library', 'consol_lib_admin');
 }
+
+add_action('admin_menu', 'consol_lib_admin_actions');
 
 
 
