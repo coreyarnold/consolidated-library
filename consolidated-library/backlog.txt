@@ -1,7 +1,9 @@
+- implement some caching so we're not always trying to pull steam games on each view
 - store images/paths? for non-steam games
 - show images for non steam games (if we have them)
 - pull in cover images from amazon if we're not already storing them
 - allow rating by clicking stars (ala Netflix) if an admin is logged in
+ o only allow admin user to update ratings
 - allow admin to toggle play_status
 
 === Release v0.3 ===
