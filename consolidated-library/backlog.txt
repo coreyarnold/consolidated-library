@@ -1,8 +1,8 @@
-- add the collection of steam user (option data)
-- add the collection of steam api key (option data)
-- pull game list in via steam api
++ add the collection of steam user (option data)
++ add the collection of steam api key (option data)
++ pull game list in via steam api
   o http://steamcommunity.com/id/[username]/games?tab=all&xml=1
-  o 
+- store steam game list in the DB if it isn't in there already   
 
 === Release v0.2 ===
 
@@ -12,6 +12,7 @@
 - allow rating by clicking stars (ala Netflix) if an admin is logged in
 - allow admin to toggle play_status
 
+- check out backloggery.com
 
 --- Major Backlog ---
 High level requirements:
