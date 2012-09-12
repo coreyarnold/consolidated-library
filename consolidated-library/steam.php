@@ -12,12 +12,12 @@ if(array_key_exists('error',$games)) {
 }
 else {
 	foreach ($games as $key => $value) {
-		echo $games[$key]->logo . '<br />';
-		echo $games[$key]->name . '<br />';
+		echo "<img src=\"" . $games[$key]->logo . '\">&nbsp;';
+		echo $games[$key]->name . '&nbsp;';
 		if (property_exists($games[$key],'hoursOnRecord')) {
-			echo "hours: " . $games[$key]->hoursOnRecord . "<br />";
+//			echo "hours: " . $games[$key]->hoursOnRecord . "<br />";
 		}
-		
+		echo "<br />";
 	}
 }
 
