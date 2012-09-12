@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: Consolidated Library
-Version: 0.2
+Version: 0.3
 Plugin URI: http://www.coreyarnold.com/ConsolidatedLibrary/
 Description: Provides a consolidated place to store libraries of things. DVDs, Books, Video Games, Board and Card Games, CDs, etc.
 Author: Corey Arnold
