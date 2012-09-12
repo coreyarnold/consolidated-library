@@ -51,6 +51,8 @@ function consol_lib_printvideogames($atts) {
 		'rating' => "all",
 		'coop' => "all",
 	), $atts ) );
+	if ($platform == "all" || $platform == "steam")
+		updateSteamGames();
 
        global $wpdb;
 //        $wpdb->show_errors();
@@ -64,7 +66,7 @@ function consol_lib_printvideogames($atts) {
 
 	if ($filters != "")
 		$filters = "WHERE $filters";
-       $sql = "select id, title, platform, genre, coop, coopMaxPlayers, rating, amazon_link, graphic_url from $tablename $filters order by title;";
+       $sql = "select id, title, platform, genre, coop, coopMaxPlayers, rating, amazon_link, graphic_url,notes from $tablename $filters order by title;";
 
        $results = $wpdb->get_results($sql, ARRAY_A);
 	if ($outputstyle == "list")
@@ -98,7 +100,7 @@ function videogames_print_list($listresultset) {
 
 function videogames_print_grid($resultset) {
        	echo "<p><b>Game Grid</b><br />";
-		echo "<table><thead><th></th><th>Title</th><th>Platform</th><th>Genre(s)</th><th>Coop</th><th>Rating</th></thead>";
+		echo "<table><thead><th></th><th>Title</th><th>Platform</th><th>Genre(s)</th><th>Coop</th><th>Rating</th><th>Notes</th></thead>";
        	foreach($resultset as $game){
 			echo "<tr>";
 			echo "<td>";
@@ -118,13 +120,14 @@ function videogames_print_grid($resultset) {
 				$coop = 'N';
 			echo "<td>" . $coop . "</td>";
 			echo "<td>" . $game['rating'] . "</td>";
+			echo "<td>" . $game['notes'] . "</td>";
 			echo "</tr>";
        	}
        	echo "</table>";
        	echo "</p>";
 }
 
-   add_shortcode( 'steamgames', 'steamgamesnow');
+//   add_shortcode( 'steamgames', 'updateSteamGames');
 
 //*************** Admin function ***************
 function consol_lib_admin() {
@@ -141,39 +144,34 @@ add_action('admin_menu', 'consol_lib_admin_actions');
 
 /************************************************/
 
-//print_r($games);
-function steamgamesnow($games)
+function updateSteamGames()
 {
-$steamid = get_option('consol_lib_steam_name');
-$community_url = "http://steamcommunity.com/";
-$api_format = "?xml=1";
-$profile_path = (is_numeric($steamid)) ? "profiles/$steamid/" : "id/$steamid/";
-$games_xml_url = $community_url.$profile_path.'games'.$api_format;
-$games = get_games($games_xml_url);
-	echo "Steam Games Now<br />";
-	
+	$steamid = get_option('consol_lib_steam_name');
+	$community_url = "http://steamcommunity.com/";
+	$api_format = "?xml=1";
+	$profile_path = (is_numeric($steamid)) ? "profiles/$steamid/" : "id/$steamid/";
+	$games_xml_url = $community_url.$profile_path.'games'.$api_format;
+	$games = get_games($games_xml_url);
+
 	if(array_key_exists('error',$games)) {
 		echo $games['error'];
 	}
 	else {
-	       	echo "<p><b>Steam Game Grid</b><br />";
-			echo "<table><thead><th></th><th>Title</th><th>Platform</th><th>Rating</th></thead>";
-
+	       	echo "<p><b>Updating Steam Games</b><br />";
+	global $wpdb;
+	$numberGamesAdded = 0;
 		foreach ($games as $key => $value) {
-			echo "<tr>";
-			echo "<td>";
-				echo "<img src=\"".$games[$key]->logo."\">";
-			echo "</td>";
-			echo "<td>" . $games[$key]->name . "</td>";
-			echo "<td>Steam</td>";
-			echo "<td>" . $game['rating'] . "</td>";
-			echo "</tr>";
+			$gameAppID = $games[$key]->appID;
+			$gameTitle = $games[$key]->name;
+			$gameLogo = $games[$key]->logo;
+			$gameNotes = "Hours on Record: " . $games[$key]->hoursOnRecord;
 
-//			if (property_exists($games[$key],'hoursOnRecord')) {
-//				echo "hours: " . $games[$key]->hoursOnRecord . "<br />";
-//			}
+			$notExists = " where not exists (select steam_appid from wp_consol_lib_videogames where steam_appid = $gameAppID)";
+			$steamInsertQuery = $wpdb->prepare("insert into wp_consol_lib_videogames (platform,steam_appid,title,graphic_url,notes) select * from (select 'steam',%d,%s,%s,%s) as vg $notExists",$gameAppID,$gameTitle,$gameLogo,$gameNotes);
+			$numRowsInserted = $wpdb->query($steamInsertQuery);
+			$numberGamesAdded += $numRowsInserted;
 		}
-       	echo "</table>";
+		echo "Number of Steam Games Added: <b>$numberGamesAdded</b>";
        	echo "</p>";
 	}
 }

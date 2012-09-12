@@ -1,16 +1,10 @@
-+ add the collection of steam user (option data)
-+ add the collection of steam api key (option data)
-+ pull game list in via steam api
-  o http://steamcommunity.com/id/[username]/games?tab=all&xml=1
-- store steam game list in the DB if it isn't in there already   
-
-=== Release v0.2 ===
-
 - store images/paths? for non-steam games
 - show images for non steam games (if we have them)
 - pull in cover images from amazon if we're not already storing them
 - allow rating by clicking stars (ala Netflix) if an admin is logged in
 - allow admin to toggle play_status
+
+=== Release v0.3 ===
 
 - check out backloggery.com
 
