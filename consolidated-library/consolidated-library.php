@@ -57,30 +57,11 @@ function consol_lib_printvideogames($atts) {
        $tablename = $wpdb->prefix . "consol_lib_videogames";
 
 	$filters = "";
-	if ($platform != "all")
-	{
-		if ($filters != "")
-			$filters .= " AND ";
-		$filters .= $wpdb->prepare("platform = %s",$platform);
-	}
-	if ($status != "all")
-	{
-		if ($filters != "")
-			$filters .= " AND ";
-		$filters .= $wpdb->prepare("status = %s",$status);
-	}	
-	if ($rating != "all")
-	{
-		if ($filters != "")
-			$filters .= " AND ";
-		$filters .= $wpdb->prepare("rating >= %d",$rating);
-	}
-	if ($coop != "all")
-	{
-		if ($filters != "")
-			$filters .= " AND ";
-		$filters .= $wpdb->prepare("coop = %s",$coop);
-	}
+	$filters = consol_lib_addFilter($filters,"platform","%s",$platform);
+	$filters = consol_lib_addFilter($filters,"status","%s",$status);
+	$filters = consol_lib_addFilter($filters,"rating","%d",$rating);
+	$filters = consol_lib_addFilter($filters,"coop","%s",$coop);
+
 	if ($filters != "")
 		$filters = "WHERE $filters";
        $sql = "select id, title, platform, genre, coop, coopMaxPlayers, rating, amazon_link, graphic_url from $tablename $filters order by title;";
@@ -90,6 +71,19 @@ function consol_lib_printvideogames($atts) {
 		videogames_print_list($results);
 	else if ( $outputstyle == "grid")
 		videogames_print_grid($results);
+}
+
+function consol_lib_addFilter($filterstring,$column,$type,$value){
+	global $wpdb;
+	if ($value == "all") {
+		return $filterstring;
+	}
+	else {
+		if ($filterstring != "")
+			$filterstring .= " AND ";
+		$filterstring .= $wpdb->prepare("$column = $type",$value);
+		return $filterstring;	
+	}
 }
 
 function videogames_print_list($listresultset) {
@@ -130,13 +124,7 @@ function videogames_print_grid($resultset) {
        	echo "</p>";
 }
 
-   add_shortcode( 'steamgames', 'videogames_liststeamgames');
-function videogames_liststeamgames(){
-}
-
-   /* Creates new database field */
-//   add_option("steam_profile", 'coreyarnold', '', 'yes');
-//   add_option("steam_api_key", 'D5B5B67015EDEA4B8C6D356445F30BEE', '', 'yes');
+   add_shortcode( 'steamgames', 'steamgamesnow');
 
 //*************** Admin function ***************
 function consol_lib_admin() {
@@ -151,5 +139,124 @@ function consol_lib_admin_actions() {
 add_action('admin_menu', 'consol_lib_admin_actions');
 
 
+/************************************************/
+
+//print_r($games);
+function steamgamesnow($games)
+{
+$steamid = get_option('consol_lib_steam_name');
+$community_url = "http://steamcommunity.com/";
+$api_format = "?xml=1";
+$profile_path = (is_numeric($steamid)) ? "profiles/$steamid/" : "id/$steamid/";
+$games_xml_url = $community_url.$profile_path.'games'.$api_format;
+$games = get_games($games_xml_url);
+	echo "Steam Games Now<br />";
+	
+	if(array_key_exists('error',$games)) {
+		echo $games['error'];
+	}
+	else {
+	       	echo "<p><b>Steam Game Grid</b><br />";
+			echo "<table><thead><th></th><th>Title</th><th>Platform</th><th>Rating</th></thead>";
+
+		foreach ($games as $key => $value) {
+			echo "<tr>";
+			echo "<td>";
+				echo "<img src=\"".$games[$key]->logo."\">";
+			echo "</td>";
+			echo "<td>" . $games[$key]->name . "</td>";
+			echo "<td>Steam</td>";
+			echo "<td>" . $game['rating'] . "</td>";
+			echo "</tr>";
+
+//			if (property_exists($games[$key],'hoursOnRecord')) {
+//				echo "hours: " . $games[$key]->hoursOnRecord . "<br />";
+//			}
+		}
+       	echo "</table>";
+       	echo "</p>";
+	}
+}
+
+	function get_games($games_xml_url) {
+		$games = array();
+		/** @var \stdClass $xml_object */
+		$xml_object = get_games_xml_as_obj($games_xml_url);
+		if (check_if_user_has_no_games($xml_object)) {
+			$games['error'] = 'no games';
+			return $games;
+		}
+		if (check_if_users_profile_is_private($xml_object)) {
+			$games['error'] = 'private_user_profile';
+			return $games;
+		}
+		if (isset($xml_object->games->game)) {
+			$games = create_games_array($xml_object->games->game);
+		}
+		return $games;
+	}
+
+	/**
+	 * SimpleXMLElement is a resource, not an object so we'll use a
+	 * hack to make it into a useable object by encoding and decoding
+	 * it to and from JSON.
+	 *
+	 * @return	bool|\stdClass
+	 */
+	function get_xml_as_obj($games_xml_url) {
+		$xml_response = get_xml($games_xml_url);
+		if ($xml_response == false) {
+			return false;
+		}
+		$xml_object = convert_to_object($xml_response);
+		return $xml_object;
+	}
+
+	function get_xml($games_xml_url) {
+		$location = $games_xml_url;
+		$xml_response = @simplexml_load_file($location, null, LIBXML_NOCDATA);
+		if ($xml_response == false) {
+			return false;
+		}
+		return $xml_response;
+	}
+
+	function get_games_xml_as_obj($games_xml_url) {
+		return get_xml_as_obj($games_xml_url);
+	}
+
+	function convert_to_object($simplexml_object) {
+		return json_decode(json_encode($simplexml_object));
+	}
+
+	function check_if_users_profile_is_private($xml_object) {
+		if (isset($xml_object->error) && preg_match('/private/', $xml_object->error)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	function check_if_user_has_no_games($xml_object) {
+		if (isset($xml_object) && isset($xml_object->games) && !isset($xml_object->games->game)) {
+			return true;
+		}
+		return false;
+	}
+
+	function create_games_array($games) {
+		$games_array = array();
+		if (is_array($games) && count($games) > 0) {
+			foreach ($games as $game) {
+				$games_array[$game->appID] = $game;
+			}
+		} elseif (is_object($games)) {
+			if (isset($games->appID)) {
+				$games_array[$games->appID] = $games;
+			}
+		}
+		return $games_array;
+	}
+/************************************************/
 
 ?>
