@@ -1,3 +1,4 @@
+- provide load of initial testing data (Amazon games)
 - implement some caching so we're not always trying to pull steam games on each view
 - store images/paths? for non-steam games
 - show images for non steam games (if we have them)
@@ -7,6 +8,11 @@
 - allow admin to toggle play_status
 
 === Release v0.3 ===
+
+- be able to show smaller thumbs for steam games
+- remove loading of initial testing data
+- allow list of friends on steam
+- check if friends on steam have same game
 
 - check out backloggery.com
 
