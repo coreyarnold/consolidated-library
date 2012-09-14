@@ -337,8 +337,10 @@ $friendSteamIDs = "";
 echo "updating friend [$friend->personaname] data<br />";
 $PersonaUpdate = dataUpdateText('PersonaName',$friend->personaname,"%s");
 $PersonaFilter = notNullFilter('PersonaName',$friend->personaname,"%s");
+$RealNameUpdate = dataUpdateText('RealName',$friend->realname,"%s");
+$RealNameFilter = notNullFilter('RealName',$friend->realname,"%s");
 $updateSQL = "update $tablename set 
-	$PersonaUpdate 
+	$PersonaUpdate
 	where steamid = $friend->steamid AND NOT (
 		$PersonaFilter
 	);";
@@ -348,8 +350,8 @@ if ($result === false)
 	echo "Error<br />";
 else if ($result == 0)
 	echo "$friend->personaname not updated. was already up to date<br />";
-//else
-//echo "updated $friend->personaname<br />";
+else
+	echo "updated $friend->personaname<br />";
 	
 	}
 
