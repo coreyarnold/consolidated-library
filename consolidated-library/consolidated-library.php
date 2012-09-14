@@ -180,11 +180,12 @@ function updateSteamGames()
 		foreach ($games as $key => $value) {
 			$gameAppID = $games[$key]->appID;
 			$gameTitle = $games[$key]->name;
+			$smallthumbgraphic = "http://cdn.steampowered.com/v/gfx/apps/".$games[$key]->appID."/capsule_sm_120.jpg";
 			$gameLogo = $games[$key]->logo;
 			$gameNotes = "Hours on Record: " . $games[$key]->hoursOnRecord;
 
 			$notExists = " where not exists (select steam_appid from wp_consol_lib_videogames where steam_appid = $gameAppID)";
-			$steamInsertQuery = $wpdb->prepare("insert into wp_consol_lib_videogames (platform,steam_appid,title,graphic_url,notes) select * from (select 'steam',%d,%s,%s,%s) as vg $notExists",$gameAppID,$gameTitle,$gameLogo,$gameNotes);
+			$steamInsertQuery = $wpdb->prepare("insert into wp_consol_lib_videogames (platform,steam_appid,title,graphic_url,notes) select * from (select 'steam',%d,%s,%s,%s) as vg $notExists",$gameAppID,$gameTitle,$smallthumbgraphic,$gameNotes);
 			$numRowsInserted = $wpdb->query($steamInsertQuery);
 			$numberGamesAdded += $numRowsInserted;
 		}

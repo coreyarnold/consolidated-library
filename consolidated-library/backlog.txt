@@ -1,13 +1,13 @@
 - implement some caching so we're not always trying to pull steam games on each view
 - load steam games in a single query rather than one per game
-- store images/paths? for non-steam games
-- show images for non steam games (if we have them)
++ show images for non steam games (if we have them)
 - pull in cover images from amazon if we're not already storing them
 - allow rating by clicking stars (ala Netflix) if an admin is logged in
  o only allow admin user to update ratings
 - allow admin to toggle play_status
-- store path to small thumb of steam games
- o concat(concat('http://cdn.steampowered.com/v/gfx/apps/',cast(steam_appid as char)),'/capsule_sm_120.jpg')
++ store path to small thumb of steam games
+ o http://cdn.steampowered.com/v/gfx/apps/<steam_appid>/capsule_sm_120.jpg
++ allow list of friends on steam
 
 == Bug List ==
 - Activation on Windows version of MySQL isn't creating the videogames table
@@ -15,13 +15,13 @@
 
 === Release v0.3 ===
 
+- store images/paths? for non-steam games
 - add pagination for long lists of games (20?, configurable via options?)
 - provide load of initial testing data (Amazon games)
 - move long notes off of first presentation, present them tooltips style
 - save steam user when saving steam games
 - be able to show smaller thumbs for steam games
 - remove loading of initial testing data
-- allow list of friends on steam
 - check if friends on steam have same game
 
 - check out backloggery.com
