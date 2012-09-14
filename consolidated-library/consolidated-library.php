@@ -46,6 +46,7 @@ Author URI: http://www.coreyarnold.com/
         `steamid` bigint(20) NOT NULL,
 		`PersonaName` varchar(100) DEFAULT NULL,
         `RealName` varchar(100) DEFAULT NULL,
+		`AvatarURL` varchar(255) DEFAULT NULL,
 		`SteamVisibilityState` int(2) DEFAULT NULL,
         `lastupdated` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
         PRIMARY KEY (`id`)
@@ -296,10 +297,8 @@ function findNewSteamFriends(){
 	global $wpdb;
 	foreach ( $json_output->friendslist->friends as $friend )
 	{
-echo "processing a friend [$friend->steamid]<br />";
         $tablename = $wpdb->prefix . "consol_lib_steamfriends";
 		$sql = $wpdb->prepare("insert into $tablename(steamid) select * from (select %d) as f where not exists(select steamid from $tablename where steamid = %d);",$friend->steamid, $friend->steamid);
-echo "sql = [$sql]<br />";
 		$wpdb->query($sql);
 	}
 }
@@ -310,9 +309,49 @@ function updateSteamFriendsData(){
 	// `SteamVisibilityState` int(2) DEFAULT NULL,
 	global $wpdb;
 	$tablename = $wpdb->prefix . "consol_lib_steamfriends";
-	$sql = $wpdb->prepare("select id,steamid,personaname,realname,steamvisibilitystate from $tablename");
-echo "\n$sql\n";
+	$sql = $wpdb->prepare("select id,steamid,personaname,realname,steamvisibilitystate from $tablename;");
+
 	$results = $wpdb->get_results($sql, ARRAY_A);
+$friendSteamIDs = "";
+	foreach ($results as $friend) {
+//		echo $friend['steamid']."<br />";
+		if ($friendSteamIDs != "")
+			$friendSteamIDs .= ",";
+		$friendSteamIDs .= $friend['steamid'];
+	}
+//echo $friendSteamIDs."<br />";
+
+	$steamAPIKey = "D5B5B67015EDEA4B8C6D356445F30BEE";
+//				   http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=D5B5B67015EDEA4B8C6D356445F30BEE&steamids=76561197960435530
+	$profileURL = "http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=" . $steamAPIKey . "&steamids=" . $friendSteamIDs;
+//	$xmlurl = $profileURL."&format=xml";
+//
+	$jsonurl = $profileURL."&format=json";
+	$json = file_get_contents($jsonurl,0,null,null);
+	$json_output = json_decode($json);
+	// so now we have a json object of response->players
+	global $wpdb;
+	foreach ( $json_output->response->players as $friend )
+	{
+//        $tablename = $wpdb->prefix . "consol_lib_steamfriends";
+echo "updating friend [$friend->personaname] data<br />";
+$PersonaUpdate = dataUpdateText('PersonaName',$friend->personaname,"%s");
+$PersonaFilter = notNullFilter('PersonaName',$friend->personaname,"%s");
+$updateSQL = "update $tablename set 
+	$PersonaUpdate 
+	where steamid = $friend->steamid AND NOT (
+		$PersonaFilter
+	);";
+//echo $updateSQL."<br />";
+$result = $wpdb->query($updateSQL);
+if ($result === false)
+	echo "Error<br />";
+else if ($result == 0)
+	echo "$friend->personaname not updated. was already up to date<br />";
+//else
+//echo "updated $friend->personaname<br />";
+	
+	}
 
 }
 
@@ -320,4 +359,16 @@ function showSteamFriends(){
 	echo "Steam Friends";
 }
 
+function dataUpdateText($column,$value,$type){
+	if ($value == "")
+		return "";
+	global $wpdb;
+	return "$column = " . $wpdb->prepare("$type",$value);
+}
+function notNullFilter($column,$value,$type){
+	if ($value == "")
+		return "";
+	global $wpdb;
+	return "$column IS NOT NULL AND $column = " . $wpdb->prepare("$type",$value);
+}
 ?>
