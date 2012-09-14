@@ -23,7 +23,8 @@
 - be able to show smaller thumbs for steam games
 - remove loading of initial testing data
 - check if friends on steam have same game
-
+- show steam games my friend(s) have that I dont (sort by recently played)
+ o maybe include steam rating
 - check out backloggery.com
 
 
