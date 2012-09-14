@@ -44,7 +44,9 @@ Author URI: http://www.coreyarnold.com/
         $sql = "CREATE TABLE `$tablename` (
         `id` int(9) NOT NULL AUTO_INCREMENT,
         `steamid` bigint(20) NOT NULL,
+		`PersonaName` varchar(100) DEFAULT NULL,
         `RealName` varchar(100) DEFAULT NULL,
+		`SteamVisibilityState` int(2) DEFAULT NULL,
         `lastupdated` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
         PRIMARY KEY (`id`)
 		) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
@@ -270,12 +272,18 @@ function updateSteamGames()
 		return $games_array;
 	}
 /************************************************/
-function updateSteamFriends(){
-	findNewSteamFriends();
+add_shortcode( 'steamfriends', 'steamfriends');
+function steamfriends(){
+	updateSteamFriends();
+	showSteamFriends();
 }
 
-function findNewSteamFriends()
-{
+function updateSteamFriends(){
+	findNewSteamFriends();
+	updateSteamFriendsData();
+}
+
+function findNewSteamFriends(){
 	$steamAPIKey = "D5B5B67015EDEA4B8C6D356445F30BEE";
 	$mySteamID = "76561198039887430";
 	$friendsURL = "http://api.steampowered.com/ISteamUser/GetFriendList/v0001/?key=" . $steamAPIKey . "&steamid=" . $mySteamID . "&relationship=friend";
@@ -288,9 +296,28 @@ function findNewSteamFriends()
 	global $wpdb;
 	foreach ( $json_output->friendslist->friends as $friend )
 	{
+echo "processing a friend [$friend->steamid]<br />";
         $tablename = $wpdb->prefix . "consol_lib_steamfriends";
-		$sql = $wpdb->prepare("insert into $tablename(steamid) values(%d) where not exists(select steamid from $tablename where steamid = %d)",$friends->steamid);
+		$sql = $wpdb->prepare("insert into $tablename(steamid) select * from (select %d) as f where not exists(select steamid from $tablename where steamid = %d);",$friend->steamid, $friend->steamid);
+echo "sql = [$sql]<br />";
+		$wpdb->query($sql);
 	}
+}
+function updateSteamFriendsData(){
+	// loop through friends in steamfriends table and update the following
+	// `PersonaName` varchar(100) DEFAULT NULL,
+    // `RealName` varchar(100) DEFAULT NULL,
+	// `SteamVisibilityState` int(2) DEFAULT NULL,
+	global $wpdb;
+	$tablename = $wpdb->prefix . "consol_lib_steamfriends";
+	$sql = $wpdb->prepare("select id,steamid,personaname,realname,steamvisibilitystate from $tablename");
+echo "\n$sql\n";
+	$results = $wpdb->get_results($sql, ARRAY_A);
+
+}
+
+function showSteamFriends(){
+	echo "Steam Friends";
 }
 
 ?>
