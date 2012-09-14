@@ -39,6 +39,18 @@ Author URI: http://www.coreyarnold.com/
 		
 		require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 		dbDelta($sql);        
+
+        $tablename = $wpdb->prefix . "consol_lib_steamfriends";
+        $sql = "CREATE TABLE `$tablename` (
+        `id` int(9) NOT NULL AUTO_INCREMENT,
+        `steamid` bigint(20) NOT NULL,
+        `RealName` varchar(100) DEFAULT NULL,
+        `lastupdated` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+        PRIMARY KEY (`id`)
+		) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
+		";
+		
+		dbDelta($sql);        
     }
     
 // [videogames outputstyle="grid/list" platform="xbox360/ps3/steam/pc/mac" status="" rating="" coop=""]
@@ -51,8 +63,10 @@ function consol_lib_printvideogames($atts) {
 		'rating' => "all",
 		'coop' => "all",
 	), $atts ) );
-	if ($platform == "all" || $platform == "steam")
+	if ($platform == "all" || $platform == "steam"){
 		updateSteamGames();
+		updateSteamFriends();
+	}
 
        global $wpdb;
 //        $wpdb->show_errors();
@@ -256,5 +270,27 @@ function updateSteamGames()
 		return $games_array;
 	}
 /************************************************/
+function updateSteamFriends(){
+	findNewSteamFriends();
+}
+
+function findNewSteamFriends()
+{
+	$steamAPIKey = "D5B5B67015EDEA4B8C6D356445F30BEE";
+	$mySteamID = "76561198039887430";
+	$friendsURL = "http://api.steampowered.com/ISteamUser/GetFriendList/v0001/?key=" . $steamAPIKey . "&steamid=" . $mySteamID . "&relationship=friend";
+	$xmlurl = $friendsURL."&format=xml";
+
+	$jsonurl = $friendsURL."&format=json";
+	$json = file_get_contents($jsonurl,0,null,null);
+	$json_output = json_decode($json);
+
+	global $wpdb;
+	foreach ( $json_output->friendslist->friends as $friend )
+	{
+        $tablename = $wpdb->prefix . "consol_lib_steamfriends";
+		$sql = $wpdb->prepare("insert into $tablename(steamid) values(%d) where not exists(select steamid from $tablename where steamid = %d)",$friends->steamid);
+	}
+}
 
 ?>

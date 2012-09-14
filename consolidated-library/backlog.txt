@@ -1,4 +1,3 @@
-- provide load of initial testing data (Amazon games)
 - implement some caching so we're not always trying to pull steam games on each view
 - load steam games in a single query rather than one per game
 - store images/paths? for non-steam games
@@ -16,6 +15,8 @@
 
 === Release v0.3 ===
 
+- add pagination for long lists of games (20?, configurable via options?)
+- provide load of initial testing data (Amazon games)
 - move long notes off of first presentation, present them tooltips style
 - save steam user when saving steam games
 - be able to show smaller thumbs for steam games
@@ -25,7 +26,11 @@
 
 - check out backloggery.com
 
---- Major Backlog ---
+
+
+/************************************************************************************/
+/*                               Major Backlog                                      */
+/************************************************************************************/
 High level requirements:
 Lists of Stuff
 
