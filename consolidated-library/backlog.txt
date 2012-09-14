@@ -10,13 +10,13 @@
 - store path to small thumb of steam games
  o concat(concat('http://cdn.steampowered.com/v/gfx/apps/',cast(steam_appid as char)),'/capsule_sm_120.jpg')
 
-
 == Bug List ==
 - Activation on Windows version of MySQL isn't creating the videogames table
  o character difference for newline?
 
 === Release v0.3 ===
 
+- move long notes off of first presentation, present them tooltips style
 - save steam user when saving steam games
 - be able to show smaller thumbs for steam games
 - remove loading of initial testing data
