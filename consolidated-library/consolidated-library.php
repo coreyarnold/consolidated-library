@@ -286,7 +286,7 @@ function updateSteamFriends(){
 }
 
 function findNewSteamFriends(){
-	$steamAPIKey = "D5B5B67015EDEA4B8C6D356445F30BEE";
+	$steamAPIKey = get_option('consol_lib_steam_api_key'); //"D5B5B67015EDEA4B8C6D356445F30BEE";
 	$mySteamID = "76561198039887430";
 	$friendsURL = "http://api.steampowered.com/ISteamUser/GetFriendList/v0001/?key=" . $steamAPIKey . "&steamid=" . $mySteamID . "&relationship=friend";
 	$xmlurl = $friendsURL."&format=xml";
@@ -322,11 +322,10 @@ $friendSteamIDs = "";
 	}
 //echo $friendSteamIDs."<br />";
 
-	$steamAPIKey = "D5B5B67015EDEA4B8C6D356445F30BEE";
+	$steamAPIKey = get_option('consol_lib_steam_api_key'); //"D5B5B67015EDEA4B8C6D356445F30BEE";
 //				   http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=D5B5B67015EDEA4B8C6D356445F30BEE&steamids=76561197960435530
 	$profileURL = "http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=" . $steamAPIKey . "&steamids=" . $friendSteamIDs;
-//	$xmlurl = $profileURL."&format=xml";
-//
+
 	$jsonurl = $profileURL."&format=json";
 	$json = file_get_contents($jsonurl,0,null,null);
 	$json_output = json_decode($json);
@@ -334,25 +333,24 @@ $friendSteamIDs = "";
 	global $wpdb;
 	foreach ( $json_output->response->players as $friend )
 	{
-//        $tablename = $wpdb->prefix . "consol_lib_steamfriends";
-echo "updating friend [$friend->personaname] data<br />";
-$PersonaUpdate = dataUpdateText('PersonaName',$friend->personaname,"%s");
-$PersonaFilter = notNullFilter('PersonaName',$friend->personaname,"%s");
-$RealNameUpdate = dataUpdateText('RealName',$friend->realname,"%s");
-$RealNameFilter = notNullFilter('RealName',$friend->realname,"%s");
-$updateSQL = "update $tablename set 
-	$PersonaUpdate
-	where steamid = $friend->steamid AND NOT (
-		$PersonaFilter
-	);";
-//echo $updateSQL."<br />";
-$result = $wpdb->query($updateSQL);
-if ($result === false)
-	echo "Error<br />";
-else if ($result == 0)
-	echo "$friend->personaname not updated. was already up to date<br />";
-else
-	echo "updated $friend->personaname<br />";
+	echo "updating friend [$friend->personaname] data<br />";
+	$PersonaUpdate = dataUpdateText('PersonaName',$friend->personaname,"%s");
+	$PersonaFilter = notNullFilter('PersonaName',$friend->personaname,"%s");
+	$RealNameUpdate = dataUpdateText('RealName',$friend->realname,"%s");
+	$RealNameFilter = notNullFilter('RealName',$friend->realname,"%s");
+	$updateSQL = "update $tablename set 
+		$PersonaUpdate
+		where steamid = $friend->steamid AND NOT (
+			$PersonaFilter
+		);";
+
+	$result = $wpdb->query($updateSQL);
+	if ($result === false)
+		echo "Error<br />";
+	else if ($result == 0)
+		echo "$friend->personaname not updated. was already up to date<br />";
+	else
+		echo "updated $friend->personaname<br />";
 	
 	}
 
