@@ -1,10 +1,8 @@
 - implement some caching so we're not always trying to pull steam games on each view
 - load steam games in a single query rather than one per game
 + show images for non steam games (if we have them)
-- pull in cover images from amazon if we're not already storing them
-- allow rating by clicking stars (ala Netflix) if an admin is logged in
- o only allow admin user to update ratings
-- allow admin to toggle play_status
+- add xbox games using Amazon information
+ o grab cover images
 + store path to small thumb of steam games
  o http://cdn.steampowered.com/v/gfx/apps/<steam_appid>/capsule_sm_120.jpg
 + allow list of friends on steam
@@ -15,6 +13,9 @@
 
 === Release v0.3 ===
 
+- allow admin to toggle play_status
+- allow rating by clicking stars (ala Netflix) if an admin is logged in
+ o only allow admin user to update ratings
 - store images/paths? for non-steam games
 - add pagination for long lists of games (20?, configurable via options?)
 - provide load of initial testing data (Amazon games)

@@ -1,4 +1,4 @@
-<?php
+	<?php
 /*
 Plugin Name: Consolidated Library
 Version: 0.3
@@ -87,9 +87,9 @@ function consol_lib_printvideogames($atts) {
 
        $results = $wpdb->get_results($sql, ARRAY_A);
 	if ($outputstyle == "list")
-		videogames_print_list($results);
+		return videogames_print_list($results);
 	else if ( $outputstyle == "grid")
-		videogames_print_grid($results);
+		return videogames_print_grid($results);
 }
 
 function consol_lib_addFilter($filterstring,$column,$type,$value){
@@ -106,42 +106,45 @@ function consol_lib_addFilter($filterstring,$column,$type,$value){
 }
 
 function videogames_print_list($listresultset) {
-       echo "<p><b>Game List</b><br />";
+       $returnString = "";
+       $returnString .= "<p><b>Game List</b><br />";
        foreach($listresultset as $game){
            $title = $game['title'];
-           echo "Title: $title<br />";
+           $returnString .= "Title: $title<br />";
        }
        
-       echo "</p>";
+       $returnString .= "</p>";
 }
 
 function videogames_print_grid($resultset) {
-       	echo "<p><b>Game Grid</b><br />";
-		echo "<table><thead><th></th><th>Title</th><th>Platform</th><th>Genre(s)</th><th>Coop</th><th>Rating</th><th>Notes</th></thead>";
+       	$returnString .= "<p><b>Game Grid</b><br />";
+		$returnString .= "<table><thead><th></th><th>Title</th><th>Platform</th><th>Genre(s)</th><th>Coop</th><th>Rating</th><th>Notes</th></thead>";
        	foreach($resultset as $game){
-			echo "<tr>";
-			echo "<td>";
+			$returnString .= "<tr>";
+			$returnString .= "<td>";
 			if ($game['graphic_url'] != "")
-				echo "<img src=\"" . $game['graphic_url'] . "\">";
-			echo "</td>";
+				$returnString .= "<img src=\"" . $game['graphic_url'] . "\">";
+			$returnString .= "</td>";
 			if ($game['amazon_link'] != "")
 				$link = "<a href=\"http://www.amazon.com/gp/product/" . $game['amazon_link'] . "/ref=as_li_ss_tl?ie=UTF8&camp=1789&creative=390957&creativeASIN=" . $game['amazon_link'] . "&linkCode=as2&tag=arnfamtim-20\">" . $game['title'] . "</a>";
 			else
 				$link = $game['title'];
-			echo "<td>" . $link . "</td>";
-			echo "<td>" . $game['platform'] . "</td>";
-			echo "<td>" . $game['genre'] . "</td>";
+			$returnString .= "<td>" . $link . "</td>";
+			$returnString .= "<td>" . $game['platform'] . "</td>";
+			$returnString .= "<td>" . $game['genre'] . "</td>";
 			if ($game['coop'] == 1)
 				$coop = 'Y';
 			else
 				$coop = 'N';
-			echo "<td>" . $coop . "</td>";
-			echo "<td>" . $game['rating'] . "</td>";
-			echo "<td>" . $game['notes'] . "</td>";
-			echo "</tr>";
+			$returnString .= "<td>" . $coop . "</td>";
+			$returnString .= "<td>" . $game['rating'] . "</td>";
+			$returnString .= "<td>" . $game['notes'] . "</td>";
+			$returnString .= "</tr>";
        	}
-       	echo "</table>";
-       	echo "</p>";
+       	$returnString .= "</table>";
+       	$returnString .= "</p>";
+
+        return $returnString;
 }
 
 //   add_shortcode( 'steamgames', 'updateSteamGames');
@@ -163,6 +166,7 @@ add_action('admin_menu', 'consol_lib_admin_actions');
 
 function updateSteamGames()
 {
+	$returnString = "";
 	$steamid = get_option('consol_lib_steam_name');
 	$community_url = "http://steamcommunity.com/";
 	$api_format = "?xml=1";
@@ -171,10 +175,10 @@ function updateSteamGames()
 	$games = get_games($games_xml_url);
 
 	if(array_key_exists('error',$games)) {
-		echo $games['error'];
+		$returnString .= $games['error'];
 	}
 	else {
-	       	echo "<p><b>Updating Steam Games</b><br />";
+	       	$returnString .= "<p><b>Updating Steam Games</b><br />";
 	global $wpdb;
 	$numberGamesAdded = 0;
 		foreach ($games as $key => $value) {
@@ -189,9 +193,11 @@ function updateSteamGames()
 			$numRowsInserted = $wpdb->query($steamInsertQuery);
 			$numberGamesAdded += $numRowsInserted;
 		}
-		echo "Number of Steam Games Added: <b>$numberGamesAdded</b>";
-       	echo "</p>";
+		$returnString .= "Number of Steam Games Added: <b>$numberGamesAdded</b>";
+       	$returnString .= "</p>";
 	}
+	
+	return $returnString;
 }
 
 	function get_games($games_xml_url) {
@@ -292,7 +298,7 @@ function findNewSteamFriends(){
 	$xmlurl = $friendsURL."&format=xml";
 
 	$jsonurl = $friendsURL."&format=json";
-	$json = file_get_contents($jsonurl,0,null,null);
+	$json = url_get_contents($jsonurl) ;//file_get_contents($jsonurl,0,null,null);
 	$json_output = json_decode($json);
 
 	global $wpdb;
@@ -304,6 +310,7 @@ function findNewSteamFriends(){
 	}
 }
 function updateSteamFriendsData(){
+//	echo "<p>";
 	// loop through friends in steamfriends table and update the following
 	// `PersonaName` varchar(100) DEFAULT NULL,
     // `RealName` varchar(100) DEFAULT NULL,
@@ -327,13 +334,13 @@ $friendSteamIDs = "";
 	$profileURL = "http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=" . $steamAPIKey . "&steamids=" . $friendSteamIDs;
 
 	$jsonurl = $profileURL."&format=json";
-	$json = file_get_contents($jsonurl,0,null,null);
+	$json = url_get_contents($jsonurl); //file_get_contents($jsonurl,0,null,null);
 	$json_output = json_decode($json);
 	// so now we have a json object of response->players
 	global $wpdb;
 	foreach ( $json_output->response->players as $friend )
 	{
-	echo "updating friend [$friend->personaname] data<br />";
+//	echo "updating friend [$friend->personaname] data<br />";
 	$PersonaUpdate = dataUpdateText('PersonaName',$friend->personaname,"%s");
 	$PersonaFilter = notNullFilter('PersonaName',$friend->personaname,"%s");
 	$RealNameUpdate = dataUpdateText('RealName',$friend->realname,"%s");
@@ -345,13 +352,13 @@ $friendSteamIDs = "";
 		);";
 
 	$result = $wpdb->query($updateSQL);
-	if ($result === false)
-		echo "Error<br />";
-	else if ($result == 0)
-		echo "$friend->personaname not updated. was already up to date<br />";
-	else
-		echo "updated $friend->personaname<br />";
-	
+//	if ($result === false)
+//		echo "Error<br />";
+//	else if ($result == 0)
+//		echo "$friend->personaname not updated. was already up to date<br />";
+//	else
+//		echo "updated $friend->personaname<br />";
+//	echo "</p>";
 	}
 
 }
@@ -371,5 +378,20 @@ function notNullFilter($column,$value,$type){
 		return "";
 	global $wpdb;
 	return "$column IS NOT NULL AND $column = " . $wpdb->prepare("$type",$value);
+}
+function url_get_contents ($Url) {
+    if (!function_exists('curl_init')){ 
+        die('CURL is not installed!');
+    }
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $Url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+	curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-type: application/json'));
+//	CURLOPT_HTTPHEADER => array('Content-type: application/json') ,
+//	curl_setopt($ch, CURLOPT_POSTFIELDS);
+//	CURLOPT_POSTFIELDS => $json_string
+    $output = curl_exec($ch);
+    curl_close($ch);
+    return $output;
 }
 ?>
