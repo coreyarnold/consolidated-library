@@ -1,11 +1,11 @@
-- implement some caching so we're not always trying to pull steam games on each view
-- load steam games in a single query rather than one per game
-+ show images for non steam games (if we have them)
-- add xbox games using Amazon information
++ FEATURE: add shortcode for showing steam friends
+- INFRASTRUCTURE: implement some caching so we're not always trying to pull steam games on each view
+- INFRASTRUCTURE: load steam games in a single query rather than one per game
++ FEATURE: show images for non steam games (if we have them)
+- FEATURE: add xbox games using Amazon information
  o grab cover images
-+ store path to small thumb of steam games
++ FEATURE: store path to small thumb of steam games
  o http://cdn.steampowered.com/v/gfx/apps/<steam_appid>/capsule_sm_120.jpg
-+ allow list of friends on steam
 
 == Bug List ==
 - Activation on Windows version of MySQL isn't creating the videogames table
@@ -57,6 +57,13 @@ when on loan, have an indicator (grayed out, name of loanee drawn on cover, etc.
 steam games
  o API integration
 friends that have the same game(s)
+
+Steam
+Xbox 360
+Xbox 720
+PS3 Games
+PC Games
+
 --Recipes
 General thoughts.
 Construct the lists as a generic list of items. Making items and extending them into books, video games, movies, etc. will allow us to reuse a lot of the similar characteristics (title, purchase price, rating, etc.) while still allowing us to add specific properties such as platform, format (dvd, blu-ray), etc.
