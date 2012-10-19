@@ -68,7 +68,6 @@ function consol_lib_printvideogames($atts) {
 	), $atts ) );
 	if ($platform == "all" || $platform == "steam"){
 		updateSteamGames();
-		updateSteamFriends();
 	}
 
        global $wpdb;
@@ -282,8 +281,8 @@ function updateSteamGames()
 /************************************************/
 add_shortcode( 'steamfriends', 'steamfriends');
 function steamfriends(){
-	updateSteamFriends();
-	showSteamFriends();
+    updateSteamFriends();
+	return showSteamFriends();
 }
 
 function updateSteamFriends(){
@@ -310,7 +309,7 @@ function findNewSteamFriends(){
 	}
 }
 function updateSteamFriendsData(){
-//	echo "<p>";
+$return = "<p>";
 	// loop through friends in steamfriends table and update the following
 	// `PersonaName` varchar(100) DEFAULT NULL,
     // `RealName` varchar(100) DEFAULT NULL,
@@ -322,12 +321,12 @@ function updateSteamFriendsData(){
 	$results = $wpdb->get_results($sql, ARRAY_A);
 $friendSteamIDs = "";
 	foreach ($results as $friend) {
-//		echo $friend['steamid']."<br />";
+$return .= $friend['steamid']."<br />";
 		if ($friendSteamIDs != "")
 			$friendSteamIDs .= ",";
 		$friendSteamIDs .= $friend['steamid'];
 	}
-//echo $friendSteamIDs."<br />";
+$return .= $friendSteamIDs."<br />";
 
 	$steamAPIKey = get_option('consol_lib_steam_api_key'); //"D5B5B67015EDEA4B8C6D356445F30BEE";
 //				   http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=D5B5B67015EDEA4B8C6D356445F30BEE&steamids=76561197960435530
@@ -340,7 +339,7 @@ $friendSteamIDs = "";
 	global $wpdb;
 	foreach ( $json_output->response->players as $friend )
 	{
-//	echo "updating friend [$friend->personaname] data<br />";
+$return .= "updating friend [$friend->personaname] data<br />";
 	$PersonaUpdate = dataUpdateText('PersonaName',$friend->personaname,"%s");
 	$PersonaFilter = notNullFilter('PersonaName',$friend->personaname,"%s");
 	$RealNameUpdate = dataUpdateText('RealName',$friend->realname,"%s");
@@ -352,19 +351,35 @@ $friendSteamIDs = "";
 		);";
 
 	$result = $wpdb->query($updateSQL);
-//	if ($result === false)
-//		echo "Error<br />";
-//	else if ($result == 0)
-//		echo "$friend->personaname not updated. was already up to date<br />";
-//	else
-//		echo "updated $friend->personaname<br />";
-//	echo "</p>";
+	if ($result === false)
+$return .= "Error<br />";
+	else if ($result == 0)
+$return .= "$friend->personaname not updated. was already up to date<br />";
+	else
+$return .= "updated $friend->personaname<br />";
+$return .= "</p>";
 	}
 
+//return $return;
 }
 
 function showSteamFriends(){
-	echo "Steam Friends";
+	global $wpdb;
+	$tablename = $wpdb->prefix . "consol_lib_steamfriends";
+
+	$sql = "select SteamID,PersonaName,RealName from $tablename order by PersonaName;";
+
+	$results = $wpdb->get_results($sql, ARRAY_A);
+	$outputString = "";
+
+	foreach ($results as $friend) {
+		$NickName = $friend['PersonaName'];
+		$RealName = "";
+		if (!is_null($friend['RealName']))
+			$RealName = $friend['RealName'];
+		$outputString .= "Friend: $NickName <br />";
+	}
+	return $outputString;
 }
 
 function dataUpdateText($column,$value,$type){
